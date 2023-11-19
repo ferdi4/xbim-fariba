@@ -24,6 +24,15 @@ using (IfcStore model = IfcStore.Open(fileName, editor))
         // load first slab
         var slab = model.Instances.FirstOrDefault<IfcSlab>();
 
+        // give me all windows in the ifc file
+        var allWindow = model.Instances.OfType<IfcWindow>();
+
+        // draw window names in the console
+        foreach (var window in allWindow)
+        {
+            Console.WriteLine(window.Name);
+        }
+
         // create material with name "Banana"
         var banana = model.Instances.New<IfcMaterial>(p =>
         {
