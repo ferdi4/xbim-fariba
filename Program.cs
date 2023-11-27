@@ -1,5 +1,6 @@
 ﻿using Xbim.Ifc;
 using Xbim.Ifc4.MaterialResource;
+using Xbim.Ifc4.PresentationAppearanceResource;
 using Xbim.Ifc4.ProductExtension;
 using Xbim.Ifc4.SharedBldgElements;
 
@@ -24,14 +25,15 @@ using (IfcStore model = IfcStore.Open(fileName, editor))
         // load first slab
         var slab = model.Instances.FirstOrDefault<IfcSlab>();
 
+        // TODO: we need connected color what ever
+        var color = slab.Model.Instances.FirstOrDefault<IfcColourRgb>();
         // give me all windows in the ifc file
-        var allWindow = model.Instances.OfType<IfcWindow>();
+        color.Red = ((255 / 255));
+        color.Green = ((0.0 / 255));
+        color.Blue = ((255 / 255));
 
         // draw window names in the console
-        foreach (var window in allWindow)
-        {
-            Console.WriteLine(window.Name);
-        }
+
 
         // create material with name "Banana"
         var banana = model.Instances.New<IfcMaterial>(p =>
