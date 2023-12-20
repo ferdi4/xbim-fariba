@@ -1,7 +1,7 @@
 ﻿using Xbim.Ifc;
-using Xbim.Ifc4.MaterialResource;
-using Xbim.Ifc4.ProductExtension;
-using Xbim.Ifc4.SharedBldgElements;
+using Xbim.Ifc4.Interfaces;
+using Xbim.Ifc4.PresentationAppearanceResource;
+
 
 const string fileName = "SampleHouse.ifc";
 
@@ -21,36 +21,44 @@ using (IfcStore model = IfcStore.Open(fileName, editor))
 {
     using (var txn = model.BeginTransaction("Quick start transaction"))
     {
-        // load first slab
-        var slab = model.Instances.FirstOrDefault<IfcSlab>();
 
-        // give me all windows in the ifc file
-        var allWindow = model.Instances.OfType<IfcWindow>();
-
-        // draw window names in the console
-        foreach (var window in allWindow)
-        {
-            Console.WriteLine(window.Name);
-        }
-
-        // create material with name "Banana"
-        var banana = model.Instances.New<IfcMaterial>(p =>
-        {
-            p.Name = "Banana";
-        });
-
-        // create material connection for our new material"
-        var associatesMaterial = model.Instances.New<IfcRelAssociatesMaterial>(m =>
-        {
-            m.GlobalId = Guid.NewGuid(); //define uuid 
-            m.RelatingMaterial = banana;
-        });
-
-        associatesMaterial.RelatedObjects.Add(slab); // connect our new material with slab slab selected in line 27
-
+        changeMaterialColor(model, "Brick, Common", 0, 0, 0);
         txn.Commit();
-
-        Console.WriteLine($"Slab {slab.Name} has now a new Material: {banana.Name}");
     }
     model.SaveAs("SampleHouse_Modified.ifc");
+}
+
+void changeMaterialColor(IfcStore model, string materialName, int red, int green, int blue)
+{
+    var models = model.Instances.Where<IIfcSurfaceStyle>(s => (s.Name?.ToString() ?? "").Contains(materialName));
+
+    var a = model.Instances.OfType<IIfcSurfaceStyle>();
+
+    foreach(var window in a)
+    {
+        Console.WriteLine(window.Name);
+    }
+
+    var amountOfStyles = models.Count();
+
+    if (amountOfStyles != 1)
+    {
+        Console.WriteLine($"0 < n < 2 allowed. Found: n={amountOfStyles}");
+        return;
+    }
+    try
+    {
+        var surefaceStyleRend = (IfcSurfaceStyleRendering)models.First().Styles.First();
+        var colour = surefaceStyleRend.SurfaceColour;
+        colour.Blue = blue/255.0;
+        colour.Red = red/255.0;
+        colour.Green = green/255;
+     
+    } catch(Exception e)
+    {
+        Console.WriteLine(e.Message);
+        return;
+    }
+    Console.WriteLine("Color sucessfully changed.");
+
 }
