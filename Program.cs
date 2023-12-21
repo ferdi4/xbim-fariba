@@ -31,14 +31,6 @@ using (IfcStore model = IfcStore.Open(fileName, editor))
 void changeMaterialColor(IfcStore model, string materialName, int red, int green, int blue)
 {
     var models = model.Instances.Where<IIfcSurfaceStyle>(s => (s.Name?.ToString() ?? "").Contains(materialName));
-
-    var a = model.Instances.OfType<IIfcSurfaceStyle>();
-
-    foreach(var window in a)
-    {
-        Console.WriteLine(window.Name);
-    }
-
     var amountOfStyles = models.Count();
 
     if (amountOfStyles != 1)
